@@ -13,7 +13,7 @@
 
 ## 复杂度分析
 
-![img](./time.png)
+![img](./img/time.png)
 
-![img](./time-graph.png)
+![img](./img/time-graph.png)
 

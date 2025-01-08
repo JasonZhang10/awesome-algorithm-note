@@ -15,5 +15,14 @@
 
 ![img](./img/time.png)
 
-![img](./img/time-graph.png)
+<img src="./img/time-graph.png" alt="img" style="zoom:80%;" />
 
+O(1): 操作数量与输入数据大小 n 无关
+
+O(n): 单层循环
+
+O(n<sup>2</sup>): 嵌套循环
+
+O(2<sup>n</sup>): 二叉树、递归、细胞分裂；指数阶增长非常迅速，在穷举法（暴力搜索、回溯等）中常见。对于数据较大的问题是不可接受的，通常需要使用动态规划或贪心算法等来解决。
+
+O(log n): 分治、递归、每轮缩减一半

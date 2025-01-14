@@ -306,3 +306,62 @@ class ArrayHashMap {
 #### 开放寻址
 
 开放寻址（open addressing）不引入额外的数据结构，而是通过“多次探测”来处理哈希冲突，探测方式主要包括线性探测、平方探测和多次哈希等(不再深入探究)。目前不同编程语言都已通过不同技术方式实现哈希改良。
+
+## 排序
+
+理想情况：运行快、原地(无须借助额外的辅助数组)、稳定(相等元素在数组中的相对顺序不发生改变)、自适应、通用性好。
+
+### 选择排序(selection sort)
+
+开启一个循环，每轮从未排序区间选择最小的元素，将其放到已排序区间的末尾
+
+```javascript
+/* 选择排序 */
+function selectionSort(nums) {
+    let n = nums.length;
+    // 外循环：未排序区间为 [i, n-1]
+    for (let i = 0; i < n - 1; i++) {
+        // 内循环：找到未排序区间内的最小元素
+        let k = i;
+        for (let j = i + 1; j < n; j++) {
+            if (nums[j] < nums[k]) {
+                k = j; // 记录最小元素的索引
+            }
+        }
+        // 将该最小元素与未排序区间的首个元素交换
+        [nums[i], nums[k]] = [nums[k], nums[i]];
+    }
+}
+```
+
+> 时间复杂度O( n<sup>2</sup> )；空间复杂度O(1)
+
+### 冒泡排序(bubble sort)
+
+通过连续地比较与交换相邻元素实现排序
+
+```javascript
+/* 冒泡排序 */
+function bubbleSort(nums) {
+    // 外循环：未排序区间为 [0, i]
+    for (let i = nums.length - 1; i > 0; i--) {
+        // 内循环：将未排序区间 [0, i] 中的最大元素交换至该区间的最右端
+        for (let j = 0; j < i; j++) {
+            if (nums[j] > nums[j + 1]) {
+                // 交换 nums[j] 与 nums[j + 1]
+                let tmp = nums[j];
+                nums[j] = nums[j + 1];
+                nums[j + 1] = tmp;
+            }
+        }
+        if (!flag) break; // 此轮“冒泡”未交换任何元素，直接跳出
+    }
+}
+```
+
+> - **时间复杂度为 O(n<sup>2</sup>)、自适应排序**：在引入 `flag` 优化后，最佳时间复杂度可达到 O(n) 。
+> - **空间复杂度为 O(1)、原地排序**：指针 i 和 j 使用常数大小的额外空间。
+> - **稳定排序**：由于在“冒泡”中遇到相等元素不交换。
+
+### 插入排序(insertion sort)
+

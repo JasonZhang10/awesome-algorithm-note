@@ -311,31 +311,6 @@ class ArrayHashMap {
 
 理想情况：运行快、原地(无须借助额外的辅助数组)、稳定(相等元素在数组中的相对顺序不发生改变)、自适应、通用性好。
 
-### 选择排序(selection sort)
-
-开启一个循环，每轮从未排序区间选择最小的元素，将其放到已排序区间的末尾
-
-```javascript
-/* 选择排序 */
-function selectionSort(nums) {
-    let n = nums.length;
-    // 外循环：未排序区间为 [i, n-1]
-    for (let i = 0; i < n - 1; i++) {
-        // 内循环：找到未排序区间内的最小元素
-        let k = i;
-        for (let j = i + 1; j < n; j++) {
-            if (nums[j] < nums[k]) {
-                k = j; // 记录最小元素的索引
-            }
-        }
-        // 将该最小元素与未排序区间的首个元素交换
-        [nums[i], nums[k]] = [nums[k], nums[i]];
-    }
-}
-```
-
-> 时间复杂度O( n<sup>2</sup> )；空间复杂度O(1)
-
 ### 冒泡排序(bubble sort)
 
 通过连续地比较与交换相邻元素实现排序
@@ -363,5 +338,163 @@ function bubbleSort(nums) {
 > - **空间复杂度为 O(1)、原地排序**：指针 i 和 j 使用常数大小的额外空间。
 > - **稳定排序**：由于在“冒泡”中遇到相等元素不交换。
 
+### 选择排序(selection sort)
+
+开启一个循环，每轮从未排序区间选择最小的元素，将其放到已排序区间的末尾
+
+```javascript
+/* 选择排序 */
+function selectionSort(nums) {
+    let n = nums.length;
+    // 外循环：未排序区间为 [i, n-1]
+    for (let i = 0; i < n - 1; i++) {
+        // 内循环：找到未排序区间内的最小元素
+        let k = i;
+        for (let j = i + 1; j < n; j++) {
+            if (nums[j] < nums[k]) {
+                k = j; // 记录最小元素的索引
+            }
+        }
+        // 将该最小元素与未排序区间的首个元素交换
+        [nums[i], nums[k]] = [nums[k], nums[i]];
+    }
+}
+```
+
+> 时间复杂度O( n<sup>2</sup> )；空间复杂度O(1)
+
 ### 插入排序(insertion sort)
+
+开启一个循环，每轮从未排序区间选择第一个的元素，将其向前移动放到已排序区间的正确位置
+
+```javascript
+/* 插入排序 */
+function insertionSort(nums) {
+    // 外循环：已排序区间为 [0, i-1]
+    for (let i = 1; i < nums.length; i++) {
+        let base = nums[i],
+            j = i - 1;
+        // 内循环：将 base 插入到已排序区间 [0, i-1] 中的正确位置
+        while (j >= 0 && nums[j] > base) {
+            nums[j + 1] = nums[j]; // 将 nums[j] 向右移动一位
+            j--;
+        }
+        nums[j + 1] = base; // 将 base 赋值到正确位置
+    }
+}
+```
+
+> 时间复杂度O( n<sup>2</sup> )；空间复杂度O(1)；稳定排序
+
+> 实际使用中**插入排序的使用频率显著高于冒泡排序和选择排序**，冒泡的计算开销比插入要大，选择排序的时间复杂度一直是O(n<sup>2</sup>)，插入排序在本来就有序时能达到最优O(n)
+
+### 快速排序(quick sort)
+
+基于分治策略
+
+1. 选取数组最左端元素作为基准数，初始化两个指针 `i` 和 `j` 分别指向数组的两端。
+2. 设置一个循环，在每轮中使用 `i`（`j`）分别寻找第一个比基准数大（小）的元素，然后交换这两个元素。
+3. 循环执行步骤 `2.` ，直到 `i` 和 `j` 相遇时停止，最后将基准数交换至两个子数组的分界线。
+
+```javascript
+/* 元素交换 */
+swap(nums, i, j) {
+    let tmp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = tmp;
+}
+
+/* 哨兵划分 */
+partition(nums, left, right) {
+    // 以 nums[left] 为基准数
+    let i = left,
+        j = right;
+    while (i < j) {
+        while (i < j && nums[j] >= nums[left]) {
+            j -= 1; // 从右向左找首个小于基准数的元素
+        }
+        while (i < j && nums[i] <= nums[left]) {
+            i += 1; // 从左向右找首个大于基准数的元素
+        }
+        // 元素交换
+        this.swap(nums, i, j); // 交换这两个元素
+    }
+    this.swap(nums, i, left); // 将基准数交换至两子数组的分界线
+    return i; // 返回基准数的索引
+}
+
+/* 快速排序 */
+quickSort(nums, left, right) {
+    // 子数组长度为 1 时终止递归
+    if (left >= right) return;
+    // 哨兵划分
+    const pivot = this.partition(nums, left, right);
+    // 递归左子数组、右子数组
+    this.quickSort(nums, left, pivot - 1);
+    this.quickSort(nums, pivot + 1, right);
+}
+```
+
+> 时间复杂度O( n log n)；空间复杂度O(n)
+
+**基准数优化**可以尽量防止出现基准数大小过大或国小而导致的左右树不平均，时间复杂度增加的情况：
+
+```javascript
+/* 选取三个候选元素的中位数 */
+medianThree(nums, left, mid, right) {
+    let l = nums[left],
+        m = nums[mid],
+        r = nums[right];
+    // m 在 l 和 r 之间
+    if ((l <= m && m <= r) || (r <= m && m <= l)) return mid;
+    // l 在 m 和 r 之间
+    if ((m <= l && l <= r) || (r <= l && l <= m)) return left;
+    return right;
+}
+
+/* 哨兵划分（三数取中值） */
+partition(nums, left, right) {
+    // 选取三个候选元素的中位数
+    let med = this.medianThree(
+        nums,
+        left,
+        Math.floor((left + right) / 2),
+        right
+    );
+    // 将中位数交换至数组最左端
+    this.swap(nums, left, med);
+    // 以 nums[left] 为基准数
+    let i = left,
+        j = right;
+    while (i < j) {
+        while (i < j && nums[j] >= nums[left]) j--; // 从右向左找首个小于基准数的元素
+        while (i < j && nums[i] <= nums[left]) i++; // 从左向右找首个大于基准数的元素
+        this.swap(nums, i, j); // 交换这两个元素
+    }
+    this.swap(nums, i, left); // 将基准数交换至两子数组的分界线
+    return i; // 返回基准数的索引
+}
+```
+
+## 分治
+
+一个问题是否适合分治，可以分三个判断依据：
+
+- **问题可以分解**：原问题可以分解成规模更小、类似的子问题，以及能够以相同方式递归地进行划分。
+- **子问题是独立的**：子问题之间没有重叠，互不依赖，可以独立解决。
+- **子问题的解可以合并**：原问题的解通过合并子问题的解得来。
+
+### 经典分治算法问题
+
+- **寻找最近点对**：该算法首先将点集分成两部分，然后分别找出两部分中的最近点对，最后找出跨越两部分的最近点对。
+- **大整数乘法**：例如 Karatsuba 算法，它将大整数乘法分解为几个较小的整数的乘法和加法。
+- **矩阵乘法**：例如 Strassen 算法，它将大矩阵乘法分解为多个小矩阵的乘法和加法。
+- **汉诺塔问题**：汉诺塔问题可以通过递归解决，这是典型的分治策略应用。
+- **求解逆序对**：在一个序列中，如果前面的数字大于后面的数字，那么这两个数字构成一个逆序对。求解逆序对问题可以利用分治的思想，借助归并排序进行求解。
+
+## 回溯
+
+## 动态规划
+
+## 贪心
 
